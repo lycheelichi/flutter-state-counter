@@ -1,7 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:to_do_reminder/MyTapCard.dart';
 
-import 'MyTapCard.dart';
+import 'counter_provider.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -13,32 +14,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int counterSum = 0;
-
-  void incrementCounter(int childCount) {
-    setState(() {
-      counterSum += childCount;
-    });
-  }
-
-  void decrementCounter(int childCount) {
-    setState(() {
-      counterSum -= childCount;
-    });
-  }
-
-  void resetCounter(){
-    setState(()=>{
-      counterSum = 0
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final providerCounter = Provider.of<CounterProvider>(context);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
       body: Column(
         children: [
           SizedBox(
@@ -53,48 +33,46 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "Flutter state",
+                    "state",
                     style: TextStyle(fontSize: 30.0),
                   ),
                   Text(
-                    counterSum.toString(),
+                    providerCounter.counterSum.toString(),
                     style: const TextStyle(fontSize: 30.0),
                   )
                 ],
               )),
             ),
           ),
-          GridView.count(
-            shrinkWrap: true,
-            crossAxisCount: 2,
-            padding: const EdgeInsets.all(5.0),
-            mainAxisSpacing: 2.0,
-            children: [
-              MyTapCard(incrementCounter, decrementCounter),
-              MyTapCard(incrementCounter, decrementCounter)
-            ],
-          ),
-          const SizedBox(
-            height: 20.0,
-          ),
           SizedBox(
             width: MediaQuery.of(context).size.width * 0.95,
             height: 50.0,
             child: ElevatedButton(
               onPressed: () {
-                resetCounter();
+                providerCounter.reset();
               },
               child: const Text("RESET"),
             ),
-          )
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.amberAccent,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.abc), label: "Hello"),
-          BottomNavigationBarItem(icon: Icon(Icons.ac_unit), label: ("nihao")),
-          BottomNavigationBarItem(icon: Icon(Icons.accessibility), label: "Wow")
+          ),
+          Expanded(
+            child: GridView.count(
+              physics: const ScrollPhysics(),
+              shrinkWrap: true,
+              crossAxisCount: 2,
+              padding: const EdgeInsets.all(5.0),
+              mainAxisSpacing: 2.0,
+              children: List<Widget>.generate(
+                providerCounter.counters.length,
+                (index) => ChildCard(
+                  index,
+                  providerCounter.counters[index].toString(),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 20.0,
+          ),
         ],
       ),
     );

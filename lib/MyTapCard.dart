@@ -1,37 +1,20 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:to_do_reminder/counter_provider.dart';
 
-class MyTapCard extends StatefulWidget {
-  MyTapCard(void Function(int childCount) this.incrementCounter, void Function(int childCount) this.decrementCounter, {Key? key})
-      : super(key: key);
-  Function(int) incrementCounter;
-  Function(int) decrementCounter;
-
-  @override
-  State<MyTapCard> createState() => _MyTapCardState();
-}
-
-class _MyTapCardState extends State<MyTapCard> {
-  int _counter = 0;
-
-  void countIncrement() {
-    _counter++;
-    widget.incrementCounter(1);
-  }
-
-  void countDecrement() {
-    _counter= _counter -1;
-    widget.decrementCounter(1);
-  }
-
-  void clearChildCount() {
-    _counter = 0;
-  }
+class ChildCard extends StatelessWidget {
+  ChildCard(this.index, this.name, {Key? key}) : super(key: key);
+  int index;
+  String name;
 
   @override
   Widget build(BuildContext context) {
+    final providerCounter = Provider.of<CounterProvider>(context);
+
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.0),
+      ),
       color: Colors.amber,
       child: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -39,12 +22,16 @@ class _MyTapCardState extends State<MyTapCard> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-            const Text(
-              'Click Me',
+            Text(
+              providerCounter.counters[index]['name'].toString(),
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
             Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+              providerCounter.counters[index]['counter'].toString(),
+              style: const TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -52,18 +39,14 @@ class _MyTapCardState extends State<MyTapCard> {
                 IconButton(
                   iconSize: 50.0,
                   onPressed: () {
-                    setState(()=>{
-                      countIncrement()
-                    });
+                    providerCounter.increment(index);
                   },
                   icon: const Icon(Icons.add_circle),
                 ),
                 IconButton(
                   iconSize: 50.0,
                   onPressed: () {
-                    setState(()=>{
-                      countDecrement()
-                    });
+                    providerCounter.decrement(index);
                   },
                   icon: const Icon(Icons.remove_circle),
                 )
